@@ -31,7 +31,7 @@ type MsgWork struct {
 }
 
 //SendAppMessage is 发送企业会话消息
-func (c *DingTalkClient) SendAppMessage(agentID string, touser string, msg string) (data OAPIResponse, err error) {
+func (c *DingTalkClient) SendWorkTextMessage(agentID string, touser string, msg string) (data OAPIResponse, err error) {
 	request := MsgWork{
 		AgentId:    agentID,
 		UserIdList: touser,
@@ -47,7 +47,7 @@ func (c *DingTalkClient) SendAppMessage(agentID string, touser string, msg strin
 }
 
 //SendAppLinkMessage is 发送企业会话链接消息
-func (c *DingTalkClient) SendAppLinkMessage(agentID, touser string, title, text string, picUrl, url string) (data OAPIResponse, err error) {
+func (c *DingTalkClient) SendWorkLinkMessage(agentID, touser string, title, text string, picUrl, url string) (data OAPIResponse, err error) {
 	request := MsgWork{
 		AgentId:    agentID,
 		UserIdList: touser,
@@ -73,7 +73,7 @@ type MsgUser struct {
 }
 
 //SendTextMessage is 发送普通文本消息
-func (c *DingTalkClient) SendTextMessage(sender string, cid string, msg string) (data OAPIResponse, err error) {
+func (c *DingTalkClient) SendUserTextMessage(sender string, cid string, msg string) (data OAPIResponse, err error) {
 	request := MsgUser{
 		Sender: sender,
 		Cid:    cid,
