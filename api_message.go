@@ -5,134 +5,90 @@ import (
 	"strconv"
 )
 
-//SendAppMessage is 发送企业会话消息
-func (c *DingTalkClient) SendAppMessage(agentID string, touser string, msg string) error {
-	if agentID == "" {
-		agentID = c.AgentID
-	}
-	var data OAPIResponse
-	request := map[string]interface{}{
-		"touser":  touser,
-		"agentid": agentID,
-		"msgtype": "text",
-		"text": map[string]interface{}{
-			"content": msg,
-		},
-	}
-	err := c.httpRPC("message/send", nil, request, &data)
-	return err
+type MsgType struct {
+	Type string      `json:"msgtype"`
+	Text interface{} `json:"text"`
+	Link interface{} `json:"link"`
 }
 
-//SendAppOAMessage is 发送OA消息
-func (c *DingTalkClient) SendAppOAMessage(agentID string, touser string, msg OAMessage) error {
-	if agentID == "" {
-		agentID = c.AgentID
+type Text struct {
+	Content string `json:"content"`
+}
+
+type Link struct {
+	MessageUrl string `json:"messageUrl"`
+	PicUrl     string `json:"picUrl"`
+	Title      string `json:"title"`
+	Text       string `json:"text"`
+}
+
+/***********************************************工作通知************************************************************/
+
+type MsgWork struct {
+	AgentId    string      `json:"agent_id"`
+	UserIdList string      `json:"userid_list"`
+	Msg        interface{} `json:"msg"`
+}
+
+//SendAppMessage is 发送企业会话消息
+func (c *DingTalkClient) SendAppMessage(agentID string, touser string, msg string) (data OAPIResponse, err error) {
+	request := MsgWork{
+		AgentId:    agentID,
+		UserIdList: touser,
+		Msg: MsgType{
+			Type: "text",
+			Text: Text{
+				Content: msg,
+			},
+		},
 	}
-	var data OAPIResponse
-	request := map[string]interface{}{
-		"touser":  touser,
-		"agentid": agentID,
-		"msgtype": "oa",
-		"oa":      msg,
-	}
-	err := c.httpRPC("message/send", nil, request, &data)
-	return err
+	err = c.httpRPC("topapi/message/corpconversation/asyncsend_v2", nil, request, &data)
+	return
 }
 
 //SendAppLinkMessage is 发送企业会话链接消息
-func (c *DingTalkClient) SendAppLinkMessage(agentID, touser string, title, text string, picUrl, url string) error {
-	if agentID == "" {
-		agentID = c.AgentID
-	}
-	var data OAPIResponse
-	request := map[string]interface{}{
-		"touser":  touser,
-		"agentid": agentID,
-		"msgtype": "link",
-		"link": map[string]string{
-			"messageUrl": url,
-			"picUrl":     picUrl,
-			"title":      title,
-			"text":       text,
+func (c *DingTalkClient) SendAppLinkMessage(agentID, touser string, title, text string, picUrl, url string) (data OAPIResponse, err error) {
+	request := MsgWork{
+		AgentId:    agentID,
+		UserIdList: touser,
+		Msg: MsgType{
+			Type: "link",
+			Text: Link{
+				MessageUrl: url,
+				PicUrl:     picUrl,
+				Title:      title,
+				Text:       text,
+			},
 		},
 	}
-	err := c.httpRPC("message/send", nil, request, &data)
-	return err
+	err = c.httpRPC("topapi/message/corpconversation/asyncsend_v2", nil, request, &data)
+	return
+}
+
+/***************************************************对私信息**************************************************************/
+type MsgUser struct {
+	Sender string `json:"sender"`
+	Cid    string `json:"cid"`
+	Msg    string `json:"msg"`
 }
 
 //SendTextMessage is 发送普通文本消息
-func (c *DingTalkClient) SendTextMessage(sender string, cid string, msg string) (data MessageResponse, err error) {
-	request := map[string]interface{}{
-		"chatid":  cid,
-		"sender":  sender,
-		"msgtype": "text",
-		"text": map[string]interface{}{
-			"content": msg,
+func (c *DingTalkClient) SendTextMessage(sender string, cid string, msg string) (data OAPIResponse, err error) {
+	request := MsgUser{
+		Sender: sender,
+		Cid:    cid,
+		Msg: MsgType{
+			Type: "text",
+			Text: Text{
+				Content: msg,
+			},
 		},
 	}
-	err = c.httpRPC("chat/send", nil, request, &data)
-	return data, err
+	err = c.httpRPC("message/send_to_conversation", nil, request, &data)
+	return
 }
 
-//SendImageMessage is 发送图片消息
-func (c *DingTalkClient) SendImageMessage(sender string, cid string, mediaID string) (data MessageResponse, err error) {
-	request := map[string]interface{}{
-		"chatid":  cid,
-		"sender":  sender,
-		"msgtype": "image",
-		"image": map[string]string{
-			"media_id": mediaID,
-		},
-	}
-	err = c.httpRPC("chat/send", nil, request, &data)
-	return data, err
-}
-
-//SendVoiceMessage is 发送语音消息
-func (c *DingTalkClient) SendVoiceMessage(sender string, cid string, mediaID string, duration string) (data MessageResponse, err error) {
-	request := map[string]interface{}{
-		"chatid":  cid,
-		"sender":  sender,
-		"msgtype": "voice",
-		"voice": map[string]string{
-			"media_id": mediaID,
-			"duration": duration,
-		},
-	}
-	err = c.httpRPC("chat/send", nil, request, &data)
-	return data, err
-}
-
-//SendFileMessage is 发送文件消息
-func (c *DingTalkClient) SendFileMessage(sender string, cid string, mediaID string) (data MessageResponse, err error) {
-	request := map[string]interface{}{
-		"chatid":  cid,
-		"sender":  sender,
-		"msgtype": "file",
-		"file": map[string]string{
-			"media_id": mediaID,
-		},
-	}
-	err = c.httpRPC("chat/send", nil, request, &data)
-	return data, err
-}
-
-//SendLinkMessage is 发送链接消息
-func (c *DingTalkClient) SendLinkMessage(sender string, cid string, mediaID string, url string, title string, text string) (data MessageResponse, err error) {
-	request := map[string]interface{}{
-		"chatid":  cid,
-		"sender":  sender,
-		"msgtype": "link",
-		"link": map[string]string{
-			"messageUrl": url,
-			"picUrl":     mediaID,
-			"title":      title,
-			"text":       text,
-		},
-	}
-	err = c.httpRPC("chat/send", nil, request, &data)
-	return data, err
-}
+/*************************************************OA消息*******************************************************/
 
 //OAMessage is the Message for OA
 type OAMessage struct {
