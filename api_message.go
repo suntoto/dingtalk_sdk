@@ -67,9 +67,9 @@ func (c *DingTalkClient) SendAppLinkMessage(agentID, touser string, title, text 
 
 /***************************************************对私信息**************************************************************/
 type MsgUser struct {
-	Sender string `json:"sender"`
-	Cid    string `json:"cid"`
-	Msg    string `json:"msg"`
+	Sender string      `json:"sender"`
+	Cid    string      `json:"cid"`
+	Msg    interface{} `json:"msg"`
 }
 
 //SendTextMessage is 发送普通文本消息
