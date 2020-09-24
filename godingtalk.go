@@ -38,13 +38,17 @@ type Unmarshallable interface {
 
 //OAPIResponse is
 type OAPIResponse struct {
-	ErrCode int    `json:"errcode"`
-	ErrMsg  string `json:"errmsg"`
+	ErrCode   interface{} `json:"errcode"`
+	TaskId    interface{} `json:"task_id"`
+	RequestId interface{} `json:"request_id"`
+	SubCode   interface{} `json:"sub_code"`
+	SubMsg    interface{} `json:"sub_msg"`
+	ErrMsg    interface{} `json:"errmsg"`
 }
 
 func (data *OAPIResponse) checkError() (err error) {
-	if data.ErrCode != 0 {
-		err = fmt.Errorf("%d: %s", data.ErrCode, data.ErrMsg)
+	if data.ErrCode != "0" {
+		err = fmt.Errorf("%s:", data.ErrCode)
 	}
 	return err
 }
