@@ -88,6 +88,25 @@ func (c *DingTalkClient) SendUserTextMessage(sender string, cid string, msg stri
 	return
 }
 
+//SendTextMessage is 发送普通链接消息
+func (c *DingTalkClient) SendUserLinkMessage(sender , cid , title, text , picUrl, url string) (data OAPIResponse, err error) {
+	request := MsgUser{
+		Sender: sender,
+		Cid:    cid,
+		Msg: MsgType{
+			Type: "link",
+			Link: Link{
+				MessageUrl: url,
+				PicUrl:     picUrl,
+				Title:      title,
+				Text:       text,
+			},
+		},
+	}
+	err = c.httpRPC("message/send_to_conversation", nil, request, &data)
+	return
+}
+
 /*************************************************OA消息*******************************************************/
 
 //OAMessage is the Message for OA
