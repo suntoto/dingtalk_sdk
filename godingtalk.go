@@ -47,7 +47,7 @@ type OAPIResponse struct {
 }
 
 func (data *OAPIResponse) checkError() (err error) {
-	if data.ErrCode != "0" {
+	if data.ErrCode.(float64) != 0 {
 		err = fmt.Errorf("%s:", data.ErrCode)
 	}
 	return err
