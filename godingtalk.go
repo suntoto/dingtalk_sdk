@@ -44,6 +44,7 @@ type OAPIResponse struct {
 	SubCode   interface{} `json:"sub_code"`
 	SubMsg    interface{} `json:"sub_msg"`
 	ErrMsg    interface{} `json:"errmsg"`
+	RecordId  interface{} `json:"record_id"`
 }
 
 func (data *OAPIResponse) checkError() (err error) {

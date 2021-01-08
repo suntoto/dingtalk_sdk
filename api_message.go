@@ -5,6 +5,14 @@ import (
 	"strconv"
 )
 
+/***********************************************工作通知************************************************************/
+
+type MsgWork struct {
+	AgentId    string      `json:"agent_id"`
+	UserIdList string      `json:"userid_list"`
+	Msg        interface{} `json:"msg"`
+}
+
 type MsgType struct {
 	Type string      `json:"msgtype"`
 	Text interface{} `json:"text"`
@@ -22,13 +30,7 @@ type Link struct {
 	Text       string `json:"text"`
 }
 
-/***********************************************工作通知************************************************************/
 
-type MsgWork struct {
-	AgentId    string      `json:"agent_id"`
-	UserIdList string      `json:"userid_list"`
-	Msg        interface{} `json:"msg"`
-}
 
 //SendAppMessage is 发送企业会话消息
 func (c *DingTalkClient) SendWorkTextMessage(agentID string, touser string, msg string) (data OAPIResponse, err error) {
@@ -106,6 +108,52 @@ func (c *DingTalkClient) SendUserLinkMessage(sender , cid , title, text , picUrl
 	err = c.httpRPC("message/send_to_conversation", nil, request, &data)
 	return
 }
+
+/**************************************************代办***********************************************************************/
+type WorkRecord struct {
+	UserId string `json:"userid"`
+	CreateTime string `json:"create_time"`
+	Title string `json:"title"`
+	Url string `json:"url"`
+	FormItemList interface{} `json:"formItemList"`
+}
+
+type FormItemList struct {
+	Title string `json:"title"`
+	Content string `json:"content"`
+}
+
+type ReWorkRecord struct {
+	UserId string `json:"userid"`
+	RecordId string `json:"record_id"`
+}
+
+//SendRecordMessage is 发送代办消息
+func (c *DingTalkClient) SendRecordMessage(userId , createTime , title, url , content string) (data OAPIResponse, err error) {
+	request := WorkRecord{
+		UserId: userId,
+		CreateTime:    createTime,
+		Title:    title,
+		Url:    url,
+		FormItemList: FormItemList{
+			Title: title,
+			Content:content,
+		},
+	}
+	err = c.httpRPC("topapi/workrecord/add", nil, request, &data)
+	return
+}
+
+//updateRecordMessage is 更新代办消息
+func (c *DingTalkClient) UpdateRecordMessage(userId , recordId  string) (data OAPIResponse, err error) {
+	request := ReWorkRecord{
+		UserId: userId,
+		RecordId: recordId,
+	}
+	err = c.httpRPC("topapi/workrecord/add", nil, request, &data)
+	return
+}
+
 
 /*************************************************OA消息*******************************************************/
 
