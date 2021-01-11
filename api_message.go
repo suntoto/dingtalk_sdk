@@ -116,6 +116,8 @@ type WorkRecord struct {
 	Title string `json:"title"`
 	Url string `json:"url"`
 	FormItemList interface{} `json:"formItemList"`
+	SourceName string `json:"source_name"`
+	BizId string `json:"biz_id"`
 }
 
 type FormItemList struct {
@@ -129,12 +131,14 @@ type ReWorkRecord struct {
 }
 
 //SendRecordMessage is 发送代办消息
-func (c *DingTalkClient) SendRecordMessage(userId , createTime , title, url , content string) (data OAPIResponse, err error) {
+func (c *DingTalkClient) SendRecordMessage(userId , createTime , title, url , content,sourceName, bizId string) (data OAPIResponse, err error) {
 	request := WorkRecord{
 		UserId: userId,
 		CreateTime:    createTime,
 		Title:    title,
 		Url:    url,
+		SourceName:    sourceName,
+		BizId:    bizId,
 		FormItemList: FormItemList{
 			Title: title,
 			Content:content,
